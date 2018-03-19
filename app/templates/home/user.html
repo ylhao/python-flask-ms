@@ -1,0 +1,103 @@
+{% extends "home/base.html" %}
+
+{% block content %}
+<div class="container">
+    {% include "home/nav.html" %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header">
+                <h3>个人信息页</h3>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form role="form">
+                <fieldset>
+                    {% include "home/alert.html" %}
+                    <input type="hidden" id="userid" value="{{ user.id }}">
+                    <div class="form-group">
+                        <label>分数</label>
+                        <input id="score" class="form-control" type="text" readonly unselectable="on" value="{{user.score}}">
+                    </div>
+                    <div class="form-group">
+                        <label>额度</label>
+                        <input id="fund" class="form-control"  type="text" readonly unselectable="on" value="{{user.fund}}">
+                    </div>
+                    <div class="form-group">
+                        <label>姓名</label>
+                        <input id="username" class="form-control"  type="text" readonly unselectable="on" value="{{user.username}}">
+                    </div>
+                    <div class="form-group">
+                        <label>学历</label>
+                        <input id="education" class="form-control" type="text" readonly unselectable="on" value="{{user.education}}">
+                    </div>
+                    <div class="form-group">
+                        <label>年级</label>
+                        <input id="grade" class="form-control" type="text" readonly unselectable="on" value="{{user.grade}}">
+                    </div>
+                    <div class="form-group">
+                        <label>手机</label>
+                        <input id="telephone" class="form-control" type="text" value="{{ user.telephone }}">
+                    </div>
+                    <div class="form-group">
+                        <label>QQ</label>
+                        <input id="qq" class="form-control" name="qq" type="text" value="{{ user.qq }}">
+                    </div>
+                    <a id="save-edit" class="btn btn-success"><span class="glyphicon glyphicon-saved"></span>&nbsp;保存修改</a>
+                    <a id="edit-password" href="{{ url_for('home.pwd_edit') }}" class="btn btn-danger"><span class="glyphicon glyphicon-edit"></span>&nbsp;修改密码</a>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src=" {{ url_for('static', filename='home/js/my.js') }} "></script>
+<script>
+    
+    $(function(){
+        $("nav ul:nth-child(1) li:nth-child(1)").addClass("active");
+        $("input:empty").attr({
+            "placeholder": "请及时录入"
+        });
+    });
+
+    $("#save-edit").click(function() {
+        hideMyAlert();
+        var user_id = $("#userid").val();
+        var telephone = $("#telephone").val();
+        var qq = $("#qq").val();
+        if(!validTelephone(telephone)) {
+            showMyAlert("手机号码格式不正确，手机号码长度为 11 位，第一位必须为 1，第二位可为 3、4、5、7、8");
+            return false;
+        }
+        if(!validQQ(qq)) {
+            showMyAlert("输入的 QQ 号格式不正确，QQ 号码长度为 5-11 且首位不能为 0");
+            return false;
+        }
+        $.ajax({
+            async: true,
+            type: "POST",
+            url: "{{ url_for('home.user') }}",
+            dataType: "json",
+            data: {
+                "user_id": user_id,
+                "telephone": telephone,
+                "qq": qq
+            },
+            success: function(data, textStatus) {
+                if(data.err_msg !== "") {
+                    showMyAlert(data.err_msg);
+                }
+                else {
+                    showSuccess("保存个人信息成功");
+                }
+            }
+        });
+        return false;
+    });
+
+</script>
+{% endblock %}

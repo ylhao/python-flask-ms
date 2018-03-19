@@ -1,0 +1,110 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+
+<h3 class="box-title">修改额度</h3>
+{% include "admin/alert.html" %}
+<form role="form">
+    <input type="hidden" id="userid" value="{{ user.id }}">
+    <div class="form-group">
+        <label>账号</label>
+        <input type="text" class="form-control" id="account" readonly unselectable="on" value="{{ user.account }}">
+    </div>
+    <div class="form-group">
+        <label>姓名</label>
+        <input type="text" class="form-control" id="username" readonly unselectable="on" value="{{ user.username }}">
+    </div>
+    <div class="form-group">
+        <label>目前额度</label>
+        <input type="text" class="form-control" id="current-fund" readonly unselectable="on" value="{{ user.fund }}">
+    </div>
+    <div class="form-group">
+        <label>奖励/扣除额度</label>
+        <select class="form-control" id="option">
+            <option value="0">奖励额度</option>
+            <option value="1">扣除额度</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>额度￥</label>
+        <input type="text" class="form-control" id="edit-fund" placeholder="请输入整数">
+    </div>
+    <div class="form-group">
+        <label>标签</label>
+        <select class="form-control" id="tag">
+            <option value="0">工具</option>
+            <option value="1">论文</option>
+            <option value="2">报告</option>
+            <option value="3">发票</option>
+            <option value="4">活动</option>
+            <option value='5'>周报</option>
+            <option value="6">其它</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label><span class="glyphicon glyphicon-edit"></span>&nbsp;详细说明</label>
+        <textarea class="form-control" id="reason" rows="5" placeholder="无详细说明"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">确认修改</button>
+</form>
+{% endblock %}
+
+{% block js %}
+<script src=" {{ url_for('static', filename='admin/js/my.js') }} "></script>
+<script>
+    $("#option").change(function(){
+        if($(this).val() === "0"){
+            $("#tag")
+            .empty()
+            .append("<option value='0'>工具</option>")
+            .append("<option value='1'>论文</option>")
+            .append("<option value='2'>报告</option>")
+            .append("<option value='3'>发票</option>")
+            .append("<option value='4'>活动</option>")
+            .append("<option value='5'>周报</option>")
+            .append("<option value='6'>其它</option>");
+        } else {
+            $("#tag")
+            .empty()
+            .append("<option value='0'>购买书籍</option>")
+            .append("<option value='1'>购买电子产品</option>")
+            .append("<option value='2'>请假</option>")
+            .append("<option value='3'>其它</option>");
+        }
+    });
+
+    $("button").click(function(){
+        hideMyAlert();
+        var edit_fund = $("#edit-fund").val();
+        if(!validFund(edit_fund)) {
+            showMyAlert("输入的金额不合法，数值不能以 0 开头，每次奖励/扣除额度应小于 10000 元，并且不能加/减 0 元");
+            return false;
+        }
+        $.ajax({
+            type: "POST",
+            async: true,
+            url:"{{ url_for('admin.fund_edit') }}",
+            dataType: "json",
+            data: {
+                "userid": $("#userid").val(),
+                "option": $("#option").val(),
+                "edit_fund": edit_fund,
+                "tag": $("#tag").find("option:selected").text(),
+                "reason": $("#reason").val()
+            },
+            success: function(data, textStatus) {
+                if(data.err_msg !== "") {
+                    showMyAlert(data.err_msg);
+                } else {
+                    showSuccess("修改额度成功");
+                    setTimeout(function() {
+                        window.location.href = "{{ url_for('admin.index') }}";
+                    }, 1000);
+                }
+            }
+        });
+        return false;
+    });
+
+</script>
+{% endblock%}

@@ -1,0 +1,102 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<h3>添加成员</h3>
+{% include "admin/alert.html" %}
+<form role="form">
+    <div class="form-group">
+        <label>账号</label>
+        <input type="text" class="form-control" id="account" placeholder="请输入账号（账号由字母数字组成" required autofocus>
+    </div>
+    <div class="form-group">
+        <label>姓名</label>
+        <input type="text" class="form-control" id="username" placeholder="成员姓名" required>
+    </div>
+    <div class="form-group">
+        <label>初始密码</label>
+        <input type="text" class="form-control" id="password" placeholder="123456" value="123456">
+    </div>
+    <div class="form-group">
+        <label>初始得分</label>
+        <input type="text" class="form-control" id="init-score" placeholder="0" value="0">
+    </div>
+    <div class="form-group">
+        <label>初始经费</label>
+        <input type="text" class="form-control" id="init-fund" placeholder="0" value="0">
+    </div>
+    <div class="form-group">
+        <label>学历</label>
+        <select class="form-control" id="education">
+            <option value="0">学硕</option>
+            <option value="1">专硕</option>
+            <option value="2">博士</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>年级</label>
+        <select class="form-control" id="grade">
+            <option value="0">一年级</option>
+            <option value="1">二年级</option>
+            <option value="2">三年级</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">添加</button>
+</form>
+{% endblock %}
+
+{% block js %}
+<script src=" {{ url_for('static', filename='admin/js/my.js') }} "></script>
+<script>
+    $("button").click(function(){
+        hideMyAlert();
+        var account = $("#account").val();
+        var password = $("#password").val();
+        var username = $("#username").val();
+        var init_score = $("#init-score").val();
+        var init_fund = $("#init-fund").val();
+        if(!validAccount(account)) {
+            showMyAlert("输入的账号不合法，账号只包含字母和数字，长度在 3-20 之间");
+            return false;
+        }
+        if(!validPassword(password)) {
+            showMyAlert("输入的密码不合法，密码只包含字母和数字，长度在 6-20 之间");
+            return false;
+        }
+        if(!validName(username)) {
+            showMyAlert("输入的姓名不合法，姓名只能包含汉字，长度在 2-4 之间");
+            return false;
+        }
+        if(!validInitScore(init_score)){
+            showMyAlert("输入的初始分数不合法，初始分数应该小于十亿分，且首位数不允许为 0");
+            return false;
+        }
+        if(!validInitFund(init_fund)){
+            showMyAlert("输入的初始额度不合法，初始额度应该小于十亿，且首位数不允许为 0");
+            return false;
+        }
+        $.ajax({
+            type: "POST",
+            async: true,
+            url: "{{ url_for('admin.user_add') }}",
+            dataType: "json",
+            data: {
+                "account": account,
+                "username": username,
+                "password": password,
+                "init_score": init_score,
+                "init_fund": init_fund,
+                "education": $("#education").find("option:selected").text(),
+                "grade":  $("#grade").find("option:selected").text()
+            },
+            success: function(data, textStatus) {
+                if(data.err_msg !== "") {
+                    showMyAlert(data.err_msg);
+                } else {
+                    showSuccess("添加新成员成功");
+                }
+            }
+        });
+        return false;
+    });
+</script>
+{% endblock %}

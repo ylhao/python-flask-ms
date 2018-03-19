@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>CAS 考评系统</title>
+    <!-- IE8/9 及以后的版本都会以最高版本IE来渲染页面 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 包含头部信息用于适应不同设备 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 包含 bootstrap 样式表 -->
+    <link rel="stylesheet" href="https://apps.bdimg.com/libs/bootstrap/3.2.0/css/bootstrap.min.css">
+    <!-- 网站 logo -->
+    <link rel="icon" href="{{ url_for('static', filename='home/images/favicon.ico') }}">
+    
+    <!-- HTML5 Shiv 和 Respond.js 用于让 IE9 以下版本支持HTML5元素和媒体查询 -->
+    <!-- 必须放在 <head> 元素中，因为 IE 浏览器在解析 HTML5 新元素时需要先加载该文件 -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- 自定义样式表 -->
+    {% block css %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='home/css/base.css') }}">
+    {% endblock %}
+</head>
+
+<body>
+    {% block content %}
+    {% endblock %}
+    <!-- JavaScript 放置在文档最后面可以使页面加载速度更快 -->
+    <!-- 可选: 包含 jQuery 库 -->
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <!-- 可选: 合并了 Bootstrap JavaScript 插件 -->
+    <script src="https://apps.bdimg.com/libs/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    {% block js %}
+    {% endblock %}
+</body>
+
+</html>

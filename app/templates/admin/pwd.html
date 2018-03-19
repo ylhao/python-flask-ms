@@ -1,0 +1,68 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<h3>修改密码</h3>
+{% include "admin/alert.html" %}
+<form>
+    <div class="form-group">
+        <label>旧密码</label>
+        <input type="password" class="form-control" id="old-password" placeholder="请输入旧密码">
+    </div>
+    <div class="form-group">
+        <label>新密码</label>
+        <input type="password" class="form-control" id="new-password" placeholder="请输入新密码">
+    </div>
+    <div class="form-group">
+        <label>确认新密码</label>
+        <input type="password" class="form-control" id="valid-password" placeholder="确认新密码">
+    </div>
+    <button type="submit" class="btn btn-primary">修改</button>
+</form>
+{% endblock %}
+
+{% block js %}
+<script src=" {{ url_for('static', filename='admin/js/my.js') }} "></script>
+<script>
+    
+  $("button").click(function() {
+    hideMyAlert();
+    var old_password = $("#old-password").val();
+    var new_password = $("#new-password").val();
+    var valid_password = $("#valid-password").val();
+    if(!validPassword(old_password)) {
+        showMyAlert("输入的旧密码不合法，密码只包含字母和数字，长度在 6-20 之间");
+        return false;
+    }
+    if(!validPassword(new_password)) {
+        showMyAlert("输入的新密码不合法，密码只包含字母和数字，长度在 6-20 之间");
+        return false;
+    }
+    if(new_password !== valid_password) {
+        showMyAlert("两次输入的密码不一致");
+        return false;        
+    }
+    $.ajax({
+        type: "POST",
+        async: true,
+        url: "{{ url_for('admin.pwd_edit') }}",
+        dataType: "json",
+        data: {
+            "old_password": old_password,
+            "new_password": new_password
+        },
+        success: function(data, textStatus) {
+            if(data.err_msg !== "") {
+                showMyAlert(data.err_msg);
+            } else {
+                showSuccess("修改密码成功");
+                setTimeout(function() {
+                    window.location.href = "{{ url_for('admin.index') }}";
+                }, 1000);
+            }
+        }
+    });
+    return false;
+  });
+
+</script>
+{% endblock %}

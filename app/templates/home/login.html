@@ -1,0 +1,62 @@
+{% extends "home/base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='home/css/signin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <form class="form-signin">
+    <h2 class="form-signin-heading">Please sign in</h2>
+    {% include "home/alert.html" %}
+    <input type="text" id="account" class="form-control" placeholder="用户名" required autofocus>
+    <input type="password" id="password" class="form-control" placeholder="密码" required>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="remember-me"> Remember me
+      </label>
+    </div>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">登录</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src=" {{ url_for('static', filename='home/js/my.js') }} "></script>
+
+<script>
+
+  $("button").click(function() {
+    hideMyAlert();
+    var account = $("#account").val();
+    var password = $("#password").val();
+    if(!validAccount(account)) {
+      showMyAlert("账号不合法，账号只包含字母和数字，长度在 3-20 之间");
+      return false;
+    }
+    if(!validAccount(password)) {
+      showMyAlert("密码不合法，密码只包含字母和数字，长度在 6-20 之间");
+      return false;
+    }
+    $.ajax({
+      type: "POST",
+      async: true,
+      url: "{{ url_for('home.login') }}",
+      dataType: "json",
+      data: {
+        "account": account,
+        "password": password
+      },
+      success: function(data, textStatus) {
+        if(data.err_msg !== "") {
+          showMyAlert(data.err_msg);
+        } else {
+          window.location.href ="{{ url_for('home.user') }}";
+        }
+      }
+    });
+    return false;
+  });
+
+</script>
+{% endblock %}

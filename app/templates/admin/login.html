@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>CAS 考评系统</title>
+    <!-- IE8/9 及以后的版本都会以最高版本IE来渲染页面 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 包含头部信息用于适应不同设备 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 包含 bootstrap 样式表 -->
+    <link rel="stylesheet" href="https://apps.bdimg.com/libs/bootstrap/3.2.0/css/bootstrap.min.css">
+    <!-- 网站 logo -->
+    <link rel="icon" href="{{ url_for('static', filename='admin/images/favicon.ico') }}">
+
+    <!-- HTML5 Shiv 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- 自定义样式表 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/css/floating-labels.css') }}">
+</head>
+
+<body>
+    <form class="form-signin">
+        <div class="text-center mb-4">
+            <img class="mb-4" src="{{ url_for('static', filename='admin/images/login.png') }}" alt="" width="180" height="180">
+            <br>
+            <br>
+        </div>
+        {% include "admin/alert.html" %}
+        <div class="form-group">
+            <input id="account" type="text" class="form-control" placeholder="请输入账号" required autofocus>
+        </div>
+        <div class="form-group">
+            <input id="password" type="password" class="form-control" placeholder="请输入密码" autofocus>
+        </div>
+        <div class="checkbox mb-3">
+            <label>
+                <input type="checkbox" value="remember-me"> Remember me
+            </label>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <p class="mt-5 mb-3 text-muted text-center">&copy; 2017-2018</p>
+    </form>
+    <!-- JavaScript 放置在文档最后面可以使页面加载速度更快 -->
+    <!-- 可选: 包含 jQuery 库 -->
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <!-- 可选: 合并了 Bootstrap JavaScript 插件 -->
+    <script src="https://apps.bdimg.com/libs/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <!-- 自己的 js -->
+    <script src="{{ url_for('static', filename='admin/js/my.js') }}"></script>
+    <script>
+
+        $("button").click(function () {
+            hideMyAlert();
+            var account = $("#account").val();
+            var password = $("#password").val();
+            console.log(account, password);
+            console.log(validAccount(account));
+            if(!validAccount(account)) {
+                showMyAlert("账号不合法，账号只包含字母和数字，长度在 3-20 之间");
+                $("#account").focus();
+                return false;
+            }
+            if(!validPassword(password)) {
+                showMyAlert("密码不合法，密码只包含字母和数字，长度在 6-20 之间");
+                $("#password").focus();
+                return false;
+            }
+            $.ajax({
+                type: "POST",
+                async: true,
+                url: "{{ url_for('admin.login') }}",
+                dataType: "json",
+                data: {
+                    "account": account,
+                    "password": password
+                },
+                success: function (data, textStatus) {
+                    if(data.err_msg !== ""){
+                        showMyAlert(data.err_msg);
+                    } else {
+                        window.location.href = "{{ url_for('admin.index') }}";
+                    }
+                }
+            });
+            return false;
+        });
+    </script>
+</body>
+
+</html>

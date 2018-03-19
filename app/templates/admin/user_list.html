@@ -1,0 +1,72 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+{% include "admin/alert.html" %}
+<h1 style="text-align:center;padding-bottom:20px;">成员列表</h1>
+<table class="table table-hover">
+    <tbody>
+        <tr>
+            <th style="display:none">id</th>
+            <th>姓名</th>
+            <th>学历</th>
+            <th>年级</th>
+            <th>手机号码</th>
+            <th>QQ</th>
+            <!-- <th>入学时间</th> -->
+            <th>删除成员/详情页</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td class="hidden-value" style="display:none">{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.education }}</td>
+            <td>{{ user.grade }}</td>
+            <td>{{ user.telephone }}</td>
+            <td>{{ user.qq }}</td>
+            <!-- <td>{{ user.adm_time }}</td> -->
+            <td>
+                <a class="user-delete label label-danger">删除</a>
+                <a class="label label-success" href="{{ url_for('home.admin_score', id=user.id) }}">得分</a>
+                <a class="label label-warning" href="{{ url_for('home.admin_fund', id=user.id) }}">额度</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block js %}
+<script src=" {{ url_for('static', filename='admin/js/my.js') }} "></script>
+<script>
+    $(function(){
+        $("td:empty").text("---");
+    });
+
+    $(".user-delete").click(function(){
+        hideMyAlert();
+        if (del() === true) {
+            var user_id = $(this).parent().siblings(".hidden-value").text();
+            var tr_dom = $(this).parent().parent()
+            $.ajax({
+                type: "POST",
+                async: true,
+                url: "{{ url_for('admin.user_delete') }}",
+                dataType: "json",
+                data: {
+                    "user_id": user_id
+                },
+                success: function(data, textStatus) {
+                    if(data.err_msg !== ""){
+                        showMyAlert(data.err_msg);
+                    } else {
+                        tr_dom.remove();
+                        showSuccessHide("删除成员成功", 1000);
+                    }
+                }
+            });
+        }
+        return false;
+    });
+
+</script>
+{% endblock %}

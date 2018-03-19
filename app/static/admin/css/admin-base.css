@@ -1,0 +1,17 @@
+.navbar-fixed-top {
+    border: 0;
+}
+
+/* 将内容向下移动 50px */
+body {
+    padding-top: 50px;
+}
+
+/* 表格内容居中 */
+th, td{
+    text-align: center;
+}
+
+.nav-sidebar {
+    text-align: center;
+}

@@ -1,0 +1,108 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<h3 class="box-title">修改分数</h3>
+{% include "admin/alert.html" %}
+<form role="form">
+    <input type="hidden" id="userid" value="{{ user.id }}">
+    <div class="form-group">
+        <label>账号</label>
+        <input type="text" class="form-control" id="account" readonly unselectable="on" value="{{ user.account }}">
+    </div>
+    <div class="form-group">
+        <label>姓名</label>
+        <input type="text" class="form-control" id="username" readonly unselectable="on" value="{{ user.username }}">
+    </div>
+    <div class="form-group">
+        <label>目前得分</label>
+        <input type="text" class="form-control" id="current-score" readonly unselectable="on" value="{{ user.score }}">
+    </div>
+    <div class="form-group">
+        <label>加/减分</label>
+        <select class="form-control" id="option">
+            <option value="0">加分</option>
+            <option value="1">减分</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>分值</label>
+        <input type="text" class="form-control" id="edit-score" placeholder="请输入整数">
+    </div>
+    <div class="form-group">
+        <label>标签</label>
+        <select class="form-control" id="tag">
+            <option value="0">工具</option>
+            <option value="1">论文</option>
+            <option value="2">报告</option>
+            <option value="3">发票</option>
+            <option value="4">活动</option>
+            <option value='5'>周报</option>
+            <option value="6">其它</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label><span class="glyphicon glyphicon-edit"></span>&nbsp;详细说明</label>
+        <textarea class="form-control" id="reason" rows="5" placeholder="无详细说明"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">确认修改</button>
+</form>
+{% endblock %}
+
+{% block js %}
+<script src=" {{ url_for('static', filename='admin/js/my.js') }} "></script>
+<script>
+     $("#option").change(function(){
+        if($(this).val() === "0"){
+            $("#tag")
+            .empty()
+            .append("<option value='0'>工具</option>")
+            .append("<option value='1'>论文</option>")
+            .append("<option value='2'>报告</option>")
+            .append("<option value='3'>发票</option>")
+            .append("<option value='4'>活动</option>")
+            .append("<option value='5'>周报</option>")
+            .append("<option value='6'>其它</option>");
+        } else {
+            $("#tag")
+            .empty()
+            .append("<option value='0'>迟到</option>")
+            .append("<option value='1'>早退</option>")
+            .append("<option value='2'>缺勤</option>")
+            .append("<option value='3'>其它</option>");
+        }
+    });
+
+    $("button").click(function(){
+        hideMyAlert();
+        var edit_score = $("#edit-score").val();
+        if(!validScore(edit_score)) {
+            showMyAlert("输入的分数不合法，数值不能以 0 开头，每次加分应小于 10000 分，并且不能加/减 0 分");
+            return false;
+        }
+        $.ajax({
+            type: "POST",
+            async: true,
+            url:"{{ url_for('admin.score_edit') }}",
+            dataType: "json",
+            data: {
+                "userid": $("#userid").val(),
+                "option": $("#option").val(),
+                "edit_score": edit_score,
+                "tag": $("#tag").find("option:selected").text(),
+                "reason": $("#reason").val()
+            },
+            success: function(data, textStatus) {
+                if(data.err_msg !== "") {
+                    showMyAlert(data.err_msg);
+                } else {
+                    showSuccess("修改分数成功");
+                    setTimeout(function() {
+                        window.location.href = "{{ url_for('admin.index') }}";
+                    }, 1000);
+                }
+            }
+        });
+        return false;
+    });
+</script>
+{% endblock %}

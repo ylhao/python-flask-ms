@@ -1,0 +1,84 @@
+{% extends "home/base.html" %}
+{% block content %}
+<div class="container">
+    {% include "home/nav.html" %}
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+        <h3>加/减分记录</h3>
+        </div>
+    </div>
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>分值</th>
+                        <th>标签</th>
+                        <th>详细原因</th>
+                        <th>时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                        {% if log.value < 0 %}
+                            <tr class="danger">
+                                <td>{{ log.value }}</td>
+                                <td>{{ log.summary }}</td>
+                                <td>{{ log.detail }}</td>
+                                <td>{{ log.update_time }}</td>
+                            </tr>
+                        {% else %}
+                            <tr class="success">
+                                <td>{{ log.value }}</td>
+                                <td>{{ log.summary }}</td>
+                                <td>{{ log.detail }}</td>
+                                <td>{{ log.update_time }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="row">
+                <div class="col-md-4">
+                </div>
+                <div class="col-md-4">
+                    <ul class="pagination">
+                        <li>
+                            <a href="#">Prev</a>
+                        </li>
+                        <li>
+                            <a href="#">1</a>
+                        </li>
+                        <li>
+                            <a href="#">2</a>
+                        </li>
+                        <li>
+                            <a href="#">3</a>
+                        </li>
+                        <li>
+                            <a href="#">4</a>
+                        </li>
+                        <li>
+                            <a href="#">5</a>
+                        </li>
+                        <li>
+                            <a href="#">Next</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    $(function(){
+        $("nav li:nth-child(2)").addClass("active");
+        $("td:empty").text("---");
+    });
+</script>
+{% endblock %}

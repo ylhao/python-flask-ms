@@ -1,0 +1,4 @@
+/* 表格内容居中 */
+th, td{
+    text-align: center;
+}

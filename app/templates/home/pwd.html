@@ -1,0 +1,88 @@
+{% extends "home/base.html" %}
+
+{% block content %}
+<div class="container">
+    {% include "home/nav.html" %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header">
+                <h3>修改密码</h3>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form role="form">
+                <fieldset>
+                    {% include "home/alert.html" %}
+                    <div class="form-group">
+                        <label><span class="glyphicon glyphicon-lock"></span>&nbsp;旧密码</label>
+                        <input id="old-password" class="form-control" placeholder="旧密码" type="password" autofocus>
+                    </div>
+                    <div class="form-group">
+                        <label><span class="glyphicon glyphicon-lock"></span>&nbsp;新密码</label>
+                        <input id="new-password" class="form-control" placeholder="新密码" type="password">
+                    </div>
+                    <div class="form-group">
+                        <label><span class="glyphicon glyphicon-lock"></span>&nbsp;确认密码</label>
+                        <input id="valid-password" class="form-control" placeholder="确认密码" type="password">
+                    </div>
+                    <button class="btn btn-success"><span class="glyphicon glyphicon-edit"></span>&nbsp;保存修改</button>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src=" {{ url_for('static', filename='home/js/my.js') }} "></script>
+
+<script>
+
+    $(function(){
+        $("nav ul:nth-child(1) li:nth-child(1)").addClass("active");
+    });
+
+    $("button").click(function() {
+        hideMyAlert();
+        var old_password = $("#old-password").val();
+        var new_password = $("#new-password").val();
+        var valid_password = $("#valid-password").val();
+        if(!validPassword(old_password)) {
+            showMyAlert("输入的旧密码不合法，密码只包含字母和数字，长度在 6-20 之间");
+            return false;
+        }
+        if(!validPassword(new_password)) {
+            showMyAlert("输入的新密码不合法，密码只包含字母和数字，长度在 6-20 之间");
+            return false;
+        }
+        if(new_password !== valid_password) {
+            showMyAlert("两次输入的密码不一致");
+            return false;        
+        }
+        $.ajax({
+            type: "POST",
+            async: true,
+            url: "{{ url_for('home.pwd_edit') }}",
+            dataType: "json",
+            data: {
+                "old_password": old_password,
+                "new_password": new_password
+            },
+            success: function(data, textStatus) {
+                if(data.err_msg !== "") {
+                    showMyAlert(data.err_msg);
+                } else {
+                    showSuccess("修改密码成功，请重新登录");
+                    setTimeout(function() {
+                        window.location.href = "{{ url_for('home.logout') }}";
+                    }, 1000);
+                }
+            }
+        });
+        return false;
+      });
+
+</script>
+{% endblock %}
